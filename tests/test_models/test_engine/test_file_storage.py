@@ -84,8 +84,10 @@ class TestFileStorage(unittest.TestCase):
         self.state = State(name="California")
         self.city = City(name="Los Angeles", state_id=self.state.id)
         self.user = User(email="test@example.com", password="password")
-        self.place = Place(name="Cozy Cabin", city_id=self.city.id, user_id=self.user.id)
-        self.review = Review(text="Great stay!", place_id=self.place.id, user_id=self.user.id)
+        self.place = Place(name="Cozy Cabin",
+                           city_id=self.city.id, user_id=self.user.id)
+        self.review = Review(text="Great stay!",
+                             place_id=self.place.id, user_id=self.user.id)
         self.amenity = Amenity(name="WiFi")
         self.base_model = BaseModel()
 
@@ -93,6 +95,7 @@ class TestFileStorage(unittest.TestCase):
     def tearDown(self):
         """Clean up after each test"""
         self.storage._FileStorage__objects = {}
+
     @unittest.skipIf(models.storage_t == 'db', "not testing file storage")
     def test_all_returns_dict(self):
         """Test that all returns the FileStorage.__objects attr"""
@@ -146,8 +149,10 @@ class TestFileStorage(unittest.TestCase):
             with self.subTest(key=key, value=value):
                 instance = value()
                 storage.new(instance)
-                retrieved_instance = storage.get(instance.__class__, instance.id)
-                self.assertTrue(retrieved_instance, storage._FileStorage__objects)
+                retrieved_instance = storage.get(instance.__class__,
+                                                 instance.id)
+                self.assertTrue(retrieved_instance,
+                                storage._FileStorage__objects)
         FileStorage._FileStorage__objects = save
 
     def test_get_nonexistent_object(self):
