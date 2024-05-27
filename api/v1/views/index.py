@@ -42,4 +42,3 @@ def get_stat():
         "users": str(storage.count(User))
     }
     return jsonify(data)
-    
