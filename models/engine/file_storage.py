@@ -74,8 +74,19 @@ class FileStorage:
         self.reload()
 
     def get(self, cls, id):
-        """Gets an object based on the cls and its id, or None if not found"""
-        return self.__objects.get("{}.{}".format(cls.__name__, id))
+        """
+        fetches specific object
+        :param cls: class of object as string
+        :param id: id of object as string
+        :return: found object or None
+        """
+        all_class = self.all(cls)
+
+        for obj in all_class.values():
+            if id == str(obj.id):
+                return obj
+
+        return None
 
     def count(self, cls=None):
         """Counts the number of objects in storage matching the given class"""
