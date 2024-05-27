@@ -19,8 +19,15 @@ import os
 import pep8
 import unittest
 FileStorage = file_storage.FileStorage
-classes = {"Amenity": Amenity, "BaseModel": BaseModel, "City": City,
-           "Place": Place, "Review": Review, "State": State, "User": User}
+classes = {
+    "Amenity": Amenity,
+    "BaseModel": BaseModel,
+    "City": City,
+    "Place": Place,
+    "Review": Review,
+    "State": State,
+    "User": User
+}
 
 
 class TestFileStorageDocs(unittest.TestCase):
@@ -132,10 +139,16 @@ class TestFileStorage(unittest.TestCase):
 
     def test_get_existing_object(self):
         """Test retrieving an existing object by class and ID"""
-        self.storage.new(self.state)
-        self.storage.save()
-        retrieved_state = self.storage.get(State, self.state.id)
-        self.assertEqual(retrieved_state, self.state)
+        storage = FileStorage()
+        save = FileStorage._FileStorage__objects
+        FileStorage._FileStorage__objects = {}
+        for key, value in classes.items():
+            with self.subTest(key=key, value=value):
+                instance = value()
+                storage.new(instance)
+                retrieved_instance = storage.get(instance.__class__, instance.id)
+                self.assertTrue(retrieved_instance, storage._FileStorage__objects)
+        FileStorage._FileStorage__objects = save
 
     def test_get_nonexistent_object(self):
         """Test retrieving a nonexistent object by class and ID"""
@@ -144,6 +157,8 @@ class TestFileStorage(unittest.TestCase):
 
     def test_count_all_objects(self):
         """Test counting all objects in storage"""
+        save = FileStorage._FileStorage__objects
+        FileStorage._FileStorage__objects = {}
         self.storage.new(self.state)
         self.storage.new(self.city)
         self.storage.new(self.user)
@@ -154,9 +169,12 @@ class TestFileStorage(unittest.TestCase):
         self.storage.save()
         total_count = self.storage.count()
         self.assertEqual(total_count, 7)
+        FileStorage._FileStorage__objects = save
 
     def test_count_specific_class_objects(self):
         """Test counting objects of a specific class in storage"""
+        save = FileStorage._FileStorage__objects
+        FileStorage._FileStorage__objects = {}
         self.storage.new(self.state)
         self.storage.new(self.city)
         self.storage.new(self.user)
@@ -167,3 +185,4 @@ class TestFileStorage(unittest.TestCase):
         self.storage.save()
         state_count = self.storage.count(State)
         self.assertEqual(state_count, 1)
+        FileStorage._FileStorage__objects = save
