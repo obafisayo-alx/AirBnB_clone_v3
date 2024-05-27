@@ -6,8 +6,9 @@ from flask import Flask
 from models import storage
 
 
-
 app = Flask(__name__)
+
+
 def create_app():
     """Create flask application."""
 
@@ -21,6 +22,7 @@ def create_app():
 def close_storage(exception):
     """close db connection when app context is torn down"""
     storage.close()
+
 
 if __name__ == "__main__":
     host = getenv("HBNB_API_HOST")
