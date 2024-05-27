@@ -27,6 +27,7 @@ def get_status():
 
     return resp
 
+
 @app_views.route('/stats', methods=['GET'], strict_slashes=False)
 def get_stat():
     """
