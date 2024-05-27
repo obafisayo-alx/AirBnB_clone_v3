@@ -24,7 +24,7 @@ def close_storage(exception):
     storage.close()
 
 
-@app.error_handler(404)
+@app.errorhandler(404)
 def not_found(error):
     return make_response(jsonify({"error": "Not found"}), 404)
 
