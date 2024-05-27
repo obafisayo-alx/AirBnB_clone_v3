@@ -2,7 +2,7 @@
 """check the status of your API"""
 
 from os import getenv
-from flask import Flask
+from flask import Flask, jsonify, make_response
 from models import storage
 
 
@@ -22,6 +22,11 @@ def create_app():
 def close_storage(exception):
     """close db connection when app context is torn down"""
     storage.close()
+
+
+@app.error_handler(404)
+def not_found(error):
+    return make_response(jsonify({"error": "Not found"}), 404)
 
 
 if __name__ == "__main__":
