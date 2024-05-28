@@ -11,54 +11,61 @@ from models.city import City
 @app_views.route("/states/<state_id>/cities",
                  methods=['GET', 'POST'],
                  strict_slashes=False)
-def cities(state_id):
-    """Handles GET and POST requests for cities belonging to particular states
-    Keyword arguments:
-    state_id -- the id of the state whoose city needs to be retrieved
-    Return: returns the city for that state
+def cities_by_state(state_id):
+    """Handles GET and POST requests for cities belonging to a particular state
+    Args:
+        state_id (str): The ID of the state whose cities need to be retrieved
+    Returns:
+        JSON response containing cities data
     """
     state = storage.get(State, state_id)
     if state is None:
-        abort(404)
+        abort(404)  # State not found, return 404 error
+
     if request.method == 'GET':
-        cities = [city.to_dict()
-                  for city in state.cities]
+        # Retrieve all cities associated with the state
+        cities = [city.to_dict() for city in state.cities]
         return jsonify(cities)
+
     elif request.method == 'POST':
         data = request.get_json()
         if not data:
-            abort(400, "Not a JSON")
+            abort(400, description="Not a JSON")
         if 'name' not in data:
-            abort(400, "Missing name")
+            abort(400, description="Missing name")
         city = City(**data)
         city.state_id = state_id
         city.save()
-        return jsonify(city.to_dict()), 201
+        return jsonify(city.to_dict()), 201  # Return the newly created city
 
 
 @app_views.route("/cities/<city_id>",
                  methods=['GET', 'PUT', 'DELETE'],
                  strict_slashes=False)
-def cities(city_id):
-    """Handles GET, DELETE and PUTT requests for cities
-    Keyword arguments:
-    city_id -- the id of the city to be retrieved
-    Return: returns the city
+def cities_by_id(city_id):
+    """Handles GET, PUT, and DELETE requests for a specific city
+    Args:
+        city_id (str): The ID of the city to be retrieved
+    Returns:
+        JSON response containing city data
     """
     city = storage.get(City, city_id)
     if city is None:
-        abort(404)
+        abort(404)  # City not found, return 404 error
+
     if request.method == 'GET':
         return jsonify(city.to_dict())
+
     elif request.method == 'PUT':
-        data = request.get_json(silent=True)
+        data = request.get_json()
         if not data:
-            abort(400, "Not a JSON")
+            abort(400, description="Not a JSON")
         for key, val in data.items():
             if key not in ['id', 'state_id', 'updated_at', 'created_at']:
                 setattr(city, key, val)
         city.save()
         return jsonify(city.to_dict())
+
     elif request.method == 'DELETE':
         city.delete()
         storage.save()
