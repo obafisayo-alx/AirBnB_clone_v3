@@ -35,5 +35,3 @@ if __name__ == "__main__":
     app = create_app()
     if host and port:
         app.run(host=host, port=port, threaded=True, debug=True)
-    else:
-        app.run(host="0.0.0.0", port=5000, threaded=True, debug=True)
