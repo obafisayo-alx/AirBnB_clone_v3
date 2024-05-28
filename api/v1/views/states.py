@@ -45,7 +45,7 @@ def state_by_id(state_id):
     if not state:
         abort(404)
     if request.method == 'GET':
-        return jsonify(state.to_json())
+        return jsonify(state.to_dict())
     elif request.method == 'PUT':
         data = request.get_json(silent=True)
         if not data:
@@ -54,7 +54,7 @@ def state_by_id(state_id):
             if key not in ['id', 'created_at', 'updated_at']:
                 setattr(state, key, val)
         state.save()
-        return jsonify(state.to_json())
+        return jsonify(state.to_dict())
     elif request.method == 'DELETE':
         state.delete()
         storage.save()
