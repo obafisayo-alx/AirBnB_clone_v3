@@ -29,11 +29,15 @@ def get_stat():
     Return: return response with json
     """
     data = {
-        "amenities": str(storage.count("Amenity")),
-        "cities": str(storage.count("City")),
-        "places": str(storage.count("Place")),
-        "reviews": str(storage.count("Review")),
-        "states": str(storage.count("State")),
-        "users": str(storage.count("User"))
+        "amenities": storage.count("Amenity"),
+        "cities": storage.count("City"),
+        "places": storage.count("Place"),
+        "reviews": storage.count("Review"),
+        "states": storage.count("State"),
+        "users": storage.count("User")
     }
-    return jsonify(data)
+
+    resp = jsonify(data)
+    resp.status_code = 200
+
+    return resp
