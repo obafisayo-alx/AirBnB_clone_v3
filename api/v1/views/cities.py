@@ -58,6 +58,8 @@ def cities_by_id(city_id):
         return jsonify(city.to_dict())
 
     elif request.method == 'PUT':
+        if not request.is_json:
+            abort(400, "Not a JSON")
         data = request.get_json()
         if not data:
             abort(400, description="Not a JSON")
