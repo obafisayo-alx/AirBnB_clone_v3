@@ -3,8 +3,7 @@
 
 
 from flask import abort, jsonify, request
-from api.v1.views import app_views
-from models import storage
+from api.v1.views import app_views, storage
 from models.state import State
 
 
@@ -22,12 +21,14 @@ def states():
     elif request.method == 'POST':
         data = request.get_json()
         if not data:
-            abort(404, description="Not a JSON")
+            abort(404, "Not a JSON")
         if 'name' not in data:
-            abort(404, description="Missing name")
+            abort(404, "Missing name")
         new_state = State(**data)
         new_state.save()
-        return jsonify(new_state.to_dict()), 201
+        res = jsonify(new_state.to_dict())
+        res.status_code = 201
+        return res
 
 
 @app_views.route("/states/<state_id>",
@@ -44,16 +45,16 @@ def state_by_id(state_id):
     if not state:
         abort(404)
     if request.method == 'GET':
-        return jsonify(state.to_dict())
+        return jsonify(state.to_json())
     elif request.method == 'PUT':
-        data = request.get_json()
+        data = request.get_json(silent=True)
         if not data:
-            abort(404, description="Not a JSON")
+            abort(404, "Not a JSON")
         for key, val in data.items():
             if key not in ['id', 'created_at', 'updated_at']:
                 setattr(state, key, val)
         state.save()
-        return jsonify(state.to_dict())
+        return jsonify(state.to_json())
     elif request.method == 'DELETE':
         state.delete()
         storage.save()
