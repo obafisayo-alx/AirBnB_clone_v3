@@ -19,6 +19,8 @@ def states():
                        for state in storage.all(State).values()]
         return jsonify(states_list)
     elif request.method == 'POST':
+        if not request.is_json:
+            abort(400, "Not a JSON")
         data = request.get_json()
         if not data:
             abort(400, "Not a JSON")
