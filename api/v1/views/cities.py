@@ -20,14 +20,15 @@ def cities_by_state(state_id):
     """
     state = storage.get(State, state_id)
     if state is None:
-        abort(404)  # State not found, return 404 error
+        abort(404)
 
     if request.method == 'GET':
-        # Retrieve all cities associated with the state
         cities = [city.to_dict() for city in state.cities]
         return jsonify(cities)
 
     elif request.method == 'POST':
+        if not request.is_json:
+            abort(400, "Not a JSON")
         data = request.get_json()
         if not data:
             abort(400, description="Not a JSON")
@@ -36,7 +37,7 @@ def cities_by_state(state_id):
         city = City(**data)
         city.state_id = state_id
         city.save()
-        return jsonify(city.to_dict()), 201  # Return the newly created city
+        return jsonify(city.to_dict()), 201
 
 
 @app_views.route("/cities/<city_id>",
@@ -51,7 +52,7 @@ def cities_by_id(city_id):
     """
     city = storage.get(City, city_id)
     if city is None:
-        abort(404)  # City not found, return 404 error
+        abort(404)
 
     if request.method == 'GET':
         return jsonify(city.to_dict())
