@@ -5,15 +5,16 @@
 from flask import abort, jsonify, request
 from api.v1.views import app_views, storage
 from models.user import User
+import hashlib
 
 
 @app_views.route('/users', methods=['GET', 'POST'], strict_slashes=False)
 def users():
     """Handles GET and POST requests for /users route.
-    Return: a list of users or created user
+    Returns: a list of users or created user
     """
     if request.method == 'GET':
-        users_list = [user.to_dict()
+        users_list = [user.to_dict(exclude=['password'])
                       for user in storage.all(User).values()]
         return jsonify(users_list)
     elif request.method == 'POST':
@@ -26,6 +27,7 @@ def users():
             abort(400, "Missing email")
         if 'password' not in data:
             abort(400, "Missing password")
+        data['password'] = hashlib.md5(data['password'].encode()).hexdigest()
         new_user = User(**data)
         new_user.save()
         res = jsonify(new_user.to_dict())
@@ -37,17 +39,19 @@ def users():
                  methods=['GET', 'PUT', 'DELETE'],
                  strict_slashes=False)
 def user_by_id(user_id):
-    """Handles GET, PUT and DELETE request for /users/<user_id>
+    """Handles GET, PUT, and DELETE request for /users/<user_id>
 
-    Keyword arguments:
-    user_id -- this is the user id
-    Return: returns the individual user gotten by the id or error
+    Args:
+        user_id (str): The ID of the user
+
+    Returns:
+        JSON response containing the individual user or appropriate error
     """
     user = storage.get(User, user_id)
     if not user:
         abort(404)
     if request.method == 'GET':
-        return jsonify(user.to_dict())
+        return jsonify(user.to_dict(exclude=['password']))
     elif request.method == 'PUT':
         data = request.get_json()
         if not data:
@@ -56,7 +60,7 @@ def user_by_id(user_id):
             if key not in ['id', 'created_at', 'updated_at']:
                 setattr(user, key, val)
         user.save()
-        return jsonify(user.to_dict())
+        return jsonify(user.to_dict(exclude=['password']))
     elif request.method == 'DELETE':
         user.delete()
         storage.save()
