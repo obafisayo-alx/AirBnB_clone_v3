@@ -47,6 +47,8 @@ def amenity_by_id(amenity_id):
     if request.method == 'GET':
         return jsonify(amenity.to_dict())
     elif request.method == 'PUT':
+        if not request.is_json:
+            abort(400, "Not a JSON")
         data = request.get_json()
         if not data:
             abort(400, "Not a JSON")
