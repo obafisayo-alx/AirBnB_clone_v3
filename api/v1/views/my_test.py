@@ -5,13 +5,11 @@ import json
 import requests
 
 if __name__ == "__main__":
-    """ Get one state
+    """ POST /api/v1/users/
     """
-    r = requests.get("http://0.0.0.0:5050/api/v1/states")
-    r_j = r.json()
-    state_id = r_j[0].get('id')
-
-    """ PUT /api/v1/states/<state_id>
-    """
-    r = requests.put("http://0.0.0.0:5050/api/v1/states/{}".format(state_id), data={ 'name': "NewStateName" }, headers={ 'Content-Type': "application/x-www-form-urlencoded" })
+    r = requests.post("http://localhost:5050/api/v1/users", data=json.dumps({ 'name': "Obafisayo" }), headers={ 'Content-Type': "application/json" })
     print(r.status_code)
+    r_j = r.json()
+    print(r.text)
+    # print(r_j.get('id') is None)
+    # print(r_j.get('name') == "NewUser")
