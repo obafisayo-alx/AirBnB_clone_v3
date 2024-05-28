@@ -3,7 +3,7 @@
 import models
 from models.base_model import BaseModel, Base
 from os import getenv
-import sqlalchemy
+import hashlib
 from sqlalchemy import Column, String
 from sqlalchemy.orm import relationship
 
@@ -27,3 +27,15 @@ class User(BaseModel, Base):
     def __init__(self, *args, **kwargs):
         """initializes user"""
         super().__init__(*args, **kwargs)
+        if 'password' in kwargs:
+            self.password = hashlib.md5(kwargs['password'].encode()).hexdigest()
+
+    @property
+    def password(self):
+        """Getter for the password"""
+        return self._password
+
+    @password.setter
+    def password(self, value):
+        """Setter for the password, hashes the value before storing it"""
+        self._password = hashlib.md5(value.encode()).hexdigest()
