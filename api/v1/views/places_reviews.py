@@ -13,7 +13,7 @@ from models.user import User
                  strict_slashes=False)
 def reviews_belonging_to_place_id(place_id):
     """list of all reviews objects of a place
-    
+
     Keyword arguments:
     place_id -- the id of the place
     Return: a json representation of the review
