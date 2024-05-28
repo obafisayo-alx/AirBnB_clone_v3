@@ -14,7 +14,7 @@ def amenities():
     """
     if request.method == 'GET':
         amenities_list = [amenity.to_dict()
-                       for amenity in storage.all(Amenity).values()]
+                          for amenity in storage.all(Amenity).values()]
         return jsonify(amenities_list)
     elif request.method == 'POST':
         if not request.is_json:
@@ -59,4 +59,3 @@ def amenity_by_id(amenity_id):
         amenity.delete()
         storage.save()
         return jsonify({}), 200
-
