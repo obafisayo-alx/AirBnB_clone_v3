@@ -4,8 +4,10 @@
 
 from api.v1.views import app_views, storage
 from models.city import City
+from models.state import State
 from models.place import Place
 from models.user import User
+from models.amenity import Amenity
 from flask import abort, jsonify, request
 
 
@@ -15,8 +17,8 @@ def places_belonging_to_city_id(city_id):
     """list of all place objects of a city
 
     Keyword arguments:
-    city_id -- The id of the city whoose places is to be found
-    Return: the list of places blonging to city_id
+    city_id -- The id of the city whose places are to be found
+    Return: the list of places belonging to city_id
     """
     city = storage.get(City, city_id)
     if city is None:
@@ -49,7 +51,7 @@ def places_belonging_to_city_id(city_id):
 @app_views.route('/places/<place_id>',
                  methods=['GET', 'PUT', 'DELETE'], strict_slashes=False)
 def places_by_id(place_id):
-    """carrys out GET, PUT and DELETE requests on the returned place
+    """carries out GET, PUT and DELETE requests on the returned place
 
     Keyword arguments:
     place_id -- the id of the place
@@ -60,7 +62,7 @@ def places_by_id(place_id):
         abort(404)
 
     if request.method == 'GET':
-        return (jsonify(place.to_dict()))
+        return jsonify(place.to_dict())
 
     if request.method == 'PUT':
         if not request.is_json:
@@ -80,3 +82,55 @@ def places_by_id(place_id):
         place.delete()
         storage.save()
         return jsonify({}), 200
+
+
+@app_views.route('/places_search', methods=['POST'], strict_slashes=False)
+def places_search():
+    """
+    Retrieves all Place objects depending
+    on the JSON in the body of the request
+    """
+    if not request.is_json:
+        abort(400, description="Not a JSON")
+
+    data = request.get_json()
+    if not data:
+        # If no data or empty JSON, return all places
+        places = storage.all(Place).values()
+        return jsonify([place.to_dict() for place in places])
+
+    states = data.get('states', [])
+    cities = data.get('cities', [])
+    amenities = data.get('amenities', [])
+
+    # Collect places based on states and cities
+    places = set()
+
+    if states:
+        for state_id in states:
+            state = storage.get(State, state_id)
+            if state:
+                for city in state.cities:
+                    places.update(city.places)
+
+    if cities:
+        for city_id in cities:
+            city = storage.get(City, city_id)
+            if city:
+                places.update(city.places)
+
+    if not states and not cities:
+        places = set(storage.all(Place).values())
+
+    # Filter places by amenities if any
+    if amenities:
+        amenities_objects = [storage.get(Amenity, amenity_id) for amenity_id in amenities]
+        amenities_objects = [amenity for amenity in amenities_objects if amenity]  # Filter out None values
+
+        filtered_places = []
+        for place in places:
+            if all(amenity in place.amenities for amenity in amenities_objects):
+                filtered_places.append(place)
+        places = filtered_places
+
+    return jsonify([place.to_dict() for place in places])
