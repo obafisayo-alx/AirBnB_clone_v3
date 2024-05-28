@@ -49,7 +49,7 @@ def state_by_id(state_id):
     if request.method == 'GET':
         return jsonify(state.to_dict())
     elif request.method == 'PUT':
-        data = request.get_json(silent=True)
+        data = request.get_json()
         if not data:
             abort(400, "Not a JSON")
         for key, val in data.items():
