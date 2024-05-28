@@ -25,7 +25,7 @@ def reviews_belonging_to_place_id(place_id):
     if request.method == 'GET':
         reviews = [review.to_dict() for review in place.reviews]
         return jsonify(reviews)
-    
+
     if request.method == 'POST':
         if not request.is_json:
             abort(400, "Not a JSON")
