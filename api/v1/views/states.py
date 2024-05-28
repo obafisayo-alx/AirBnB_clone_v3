@@ -21,9 +21,9 @@ def states():
     elif request.method == 'POST':
         data = request.get_json()
         if not data:
-            abort(404, "Not a JSON")
+            abort(400, "Not a JSON")
         if 'name' not in data:
-            abort(404, "Missing name")
+            abort(400, "Missing name")
         new_state = State(**data)
         new_state.save()
         res = jsonify(new_state.to_dict())
@@ -49,7 +49,7 @@ def state_by_id(state_id):
     elif request.method == 'PUT':
         data = request.get_json(silent=True)
         if not data:
-            abort(404, "Not a JSON")
+            abort(400, "Not a JSON")
         for key, val in data.items():
             if key not in ['id', 'created_at', 'updated_at']:
                 setattr(state, key, val)

@@ -12,7 +12,7 @@ from models.city import City
                  methods=['GET', 'POST'],
                  strict_slashes=False)
 def cities(state_id):
-    """Handles GET and POST requests for cities
+    """Handles GET and POST requests for cities belonging to particular states
     Keyword arguments:
     state_id -- the id of the state whoose city needs to be retrieved
     Return: returns the city for that state
@@ -34,3 +34,32 @@ def cities(state_id):
         city.state_id = state_id
         city.save()
         return jsonify(city.to_dict()), 201
+
+
+@app_views.route("/cities/<city_id>",
+                 methods=['GET', 'PUT', 'DELETE'],
+                 strict_slashes=False)
+def cities(city_id):
+    """Handles GET, DELETE and PUTT requests for cities
+    Keyword arguments:
+    city_id -- the id of the city to be retrieved
+    Return: returns the city
+    """
+    city = storage.get(City, city_id)
+    if city is None:
+        abort(404)
+    if request.method == 'GET':
+        return jsonify(city.to_dict())
+    elif request.method == 'PUT':
+        data = request.get_json(silent=True)
+        if not data:
+            abort(400, "Not a JSON")
+        for key, val in data.items():
+            if key not in ['id', 'state_id', 'updated_at', 'created_at']:
+                setattr(city, key, val)
+        city.save()
+        return jsonify(city.to_dict())
+    elif request.method == 'DELETE':
+        city.delete()
+        storage.save()
+        return jsonify({}), 200
