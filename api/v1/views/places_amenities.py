@@ -6,6 +6,7 @@ from api.v1.views import app_views, storage
 from models.place import Place
 from models.amenity import Amenity
 
+
 @app_views.route("/places/<place_id>/amenities",
                  methods=['GET'],
                  strict_slashes=False)
@@ -22,6 +23,7 @@ def get_amenities_for_place(place_id):
 
     amenities_list = [amenity.to_dict() for amenity in place.amenities]
     return jsonify(amenities_list)
+
 
 @app_views.route("/places/<place_id>/amenities/<amenity_id>",
                  methods=['DELETE', 'POST'],
