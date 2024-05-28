@@ -17,7 +17,7 @@ def users():
                       for user in storage.all(User).values()]
         return jsonify(users_list)
     elif request.method == 'POST':
-        if not request.is_json():
+        if not request.is_json:
             abort(400, "Not a JSON")
         data = request.get_json()
         if not data:

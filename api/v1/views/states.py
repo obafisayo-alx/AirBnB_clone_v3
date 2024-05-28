@@ -49,6 +49,8 @@ def state_by_id(state_id):
     if request.method == 'GET':
         return jsonify(state.to_dict())
     elif request.method == 'PUT':
+        if not request.is_json:
+            abort(400, "Not a JSON")
         data = request.get_json()
         if not data:
             abort(400, "Not a JSON")
